@@ -1,0 +1,485 @@
+#include <stdio.h>
+
+void setup() {
+  // Set up the necessary hardware or software components
+}
+
+void loop() {
+  // Perform the main tasks of the program
+  
+# Safety Protocol
+
+# Import necessary libraries
+import time
+import RPi.GPIO as GPIO
+
+# Set up GPIO pins
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+GPIO.setup(11, GPIO.IN)  # Touch sensor input pin
+
+# Define functions
+def move_forward():
+    # Code to move hexapod forward
+
+def stop():
+    # Code to stop hexapod
+
+def back_up():
+    # Code to back up hexapod
+
+# Main code
+while True:
+    if GPIO.input(11):  # Check if touch sensor is triggered
+        stop()  # Stop hexapod
+        print("Warning: Hexapod has been touched!")
+        time.sleep(1)  # Wait for 1 second
+        back_up()  # Back up hexapod
+    else:
+        move_forward()  # Continue moving forward
+
+
+  import numpy as np
+import math
+
+# Initialize hexapod position and map
+x = 0
+y = 0
+theta = 0
+map = np.zeros((100,100))
+
+# Define sensor parameters
+sensor_range = 5
+sensor_fov = 90
+
+# Define landmarks
+landmarks = [(10,10), (20,20), (30,30)]
+
+# Loop through hexapod movement
+for i in range(100):
+
+    # Move hexapod
+    x += 0.1
+    y += 0.1
+    theta += math.pi / 6
+
+    # Sense environment
+    for landmark in landmarks:
+        dx = landmark[0] - x
+        dy = landmark[1] - y
+        distance = math.sqrt(dx**2 + dy**2)
+
+        # Check if landmark is within sensor range and field of view
+        if distance <= sensor_range and abs(math.atan2(dy, dx) - theta) <= math.radians(sensor_fov) / 2:
+            # Update map
+            map[int(landmark[0])][int(landmark[1])] = 1
+
+    # Perform SLAM
+    # ...
+
+    # Print hexapod position and map
+    print("Hexapod position: x=%f, y=%f, theta=%f" % (x, y, theta))
+    print("Map:")
+    print(map)
+  
+  import cv2
+import numpy as np
+
+# initialize camera
+cap = cv2.VideoCapture(0)
+
+# set up object tracker
+tracker = cv2.TrackerKCF_create()
+initBB = None
+
+# initialize hexapod movement
+# move_forward, move_backward, move_left, move_right are functions that control hexapod movement
+def move_forward():
+    # code to move hexapod forward
+    pass
+
+def move_backward():
+    # code to move hexapod backward
+    pass
+
+def move_left():
+    # code to move hexapod left
+    pass
+
+def move_right():
+    # code to move hexapod right
+    pass
+
+# loop over frames from the camera
+while True:
+    # grab the current frame
+    ret, frame = cap.read()
+
+    # check if frame is successfully read
+    if not ret:
+        break
+
+    # convert frame to grayscale
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # if the tracking has not started yet
+    if initBB is None:
+        # select the object to track using a bounding box
+        bbox = cv2.selectROI("Frame", frame, fromCenter=False, showCrosshair=True)
+        # start the tracking
+        tracker.init(gray, bbox)
+        initBB = bbox
+
+    # update the tracker
+    success, bbox = tracker.update(gray)
+
+    # check if tracking was successful
+    if success:
+        # extract the coordinates of the bounding box
+        (x, y, w, h) = [int(v) for v in bbox]
+
+        # draw the bounding box on the frame
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+        # calculate the center of the bounding box
+        center_x = x + w // 2
+        center_y = y + h // 2
+
+        # calculate the distance between the center of the bounding box and the center of the frame
+        # this will be used to determine the direction in which the hexapod should move
+        distance_x = center_x - frame.shape[1] // 2
+        distance_y = center_y - frame.shape[0] // 2
+
+        # determine the direction in which the hexapod should move
+        if abs(distance_x) > abs(distance_y):
+            if distance_x > 0:
+                move_right()
+            else:
+                move_left()
+        else:
+            if distance_y > 0:
+                move_backward()
+            else:
+                move_forward()
+
+    # show the frame
+    cv2.imshow("Frame", frame)
+    key = cv2.waitKey(1) & 0xFF
+
+    # break the loop if the 'q' key is pressed
+    if key == ord("q"):
+        break
+
+# cleanup
+cap.release()
+cv2.destroyAllWindows()
+  
+  #include <stdio.h>
+
+// Define global variables and constants
+const int SENSOR_PIN = 5;
+const int MOTOR_PIN = 9;
+bool exploring = true;
+bool mapping = false;
+
+// Function to set up the necessary hardware or software components
+void setup() {
+  // Initialize sensors and motors
+}
+
+// Function to move the robot forward
+void moveForward() {
+  // Move the robot forward using the motors
+}
+
+// Function to turn the robot to the left
+void turnLeft() {
+  // Turn the robot to the left using the motors
+}
+
+// Function to turn the robot to the right
+void turnRight() {
+  // Turn the robot to the right using the motors
+}
+
+// Function to stop the robot
+void stop() {
+  // Stop the robot using the motors
+}
+
+// Function to record data about the environment
+void recordData() {
+  // Record sensor data and store it in memory
+}
+
+// Function to map the environment
+void mapEnvironment() {
+  // Process the sensor data and generate a map of the environment
+}
+
+// Main loop function to control the robot's behavior
+void loop() {
+  // Move the robot forward while exploring
+  if (exploring) {
+    moveForward();
+    recordData();
+  }
+
+  // If the sensor detects an obstacle, turn the robot to avoid it
+  if (digitalRead(SENSOR_PIN) == HIGH) {
+    turnLeft();
+  }
+
+  // Stop the robot when it has finished exploring
+  if (!exploring && !mapping) {
+    stop();
+  }
+
+  // Generate a map of the environment after exploring
+  if (!exploring && !mapping) {
+    mapping = true;
+    mapEnvironment();
+  }
+}
+
+// Entry point of the program
+int main() {
+  setup();
+
+  // Start exploring the environment
+  exploring = true;
+
+  // Run the main loop continuously
+  while (true) {
+    loop();
+  }
+
+  return 0;
+}
+import numpy as np
+
+# function to save matrix to file
+def save_matrix(matrix, file_path):
+    np.savetxt(file_path, matrix, delimiter=",")
+
+# function to load matrix from file
+def load_matrix(file_path):
+    matrix = np.loadtxt(file_path, delimiter=",")
+    return matrix
+
+# initialize matrix
+matrix = np.zeros((10, 10))
+
+# explore and update matrix...
+
+# save matrix to file
+file_path = "map_data.csv"
+save_matrix(matrix, file_path)
+
+# load matrix from file
+matrix = load_matrix(file_path)
+
+# continue exploring and updating matrix...
+
+
+}
+
+void printMessage() {
+  // import cv2
+import numpy as np
+
+# Initialize camera and tracker
+cap = cv2.VideoCapture(0)
+tracker = cv2.TrackerKCF_create()
+
+# Initialize variables
+direction = "forward"
+item_in_frame = False
+
+# Loop through video frames
+while True:
+    # Read a frame from the video stream
+    ret, frame = cap.read()
+    
+    # Check if frame was successfully read
+    if not ret:
+        break
+    
+    # If an item is not in frame, try to detect it
+    if not item_in_frame:
+        # Detect object using object detection algorithm
+        # object_detection(frame)
+        
+        # If object is detected, start tracking it
+        # bbox = (x, y, w, h)
+        bbox = (0, 0, 100, 100)
+        tracker.init(frame, bbox)
+        item_in_frame = True
+    
+    # Update tracker on current frame
+    success, bbox = tracker.update(frame)
+    
+    # If tracking was successful, draw bounding box on object
+    if success:
+        # Draw bounding box around object being tracked
+        x, y, w, h = [int(i) for i in bbox]
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        
+        # Check position of object in frame
+        x_center = x + w/2
+        if x_center < frame.shape[1]/3:
+            direction = "left"
+        elif x_center > 2*frame.shape[1]/3:
+            direction = "right"
+        else:
+            direction = "forward"
+        
+        # Print message to console based on direction and if item is in frame
+        if item_in_frame:
+            print("Tracking object ahead, moving", direction)
+        else:
+            print("No object in frame, moving", direction)
+            
+    # If tracking was unsuccessful, set item_in_frame to False and try to detect object again
+    else:
+        item_in_frame = False
+        
+    # Show the frame with the bounding box drawn
+    cv2.imshow("Tracking", frame)
+    
+    # Exit loop if 'q' key is pressed
+    if cv2.waitKey(1) == ord('q'):
+        break
+
+# Release camera and close all windows
+cap.release()
+cv2.destroyAllWindows()
+
+int main() {
+  setup();
+
+#!/usr/bin/env python
+
+import rospy
+from sensor_msgs.msg import LaserScan
+from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Twist
+from tf.transformations import euler_from_quaternion, quaternion_from_euler
+from math import atan2
+from slam_gmapping import SlamGMapping
+import numpy as np
+
+class FreenoveHexapodSLAM:
+    def __init__(self):
+        rospy.init_node('freenove_hexapod_slam')
+        
+        # Initialize variables
+        self.position_x = 0.0
+        self.position_y = 0.0
+        self.orientation = 0.0
+        self.scan_data = None
+        
+        # Initialize publishers and subscribers
+        self.odom_sub = rospy.Subscriber('/odom', Odometry, self.odom_callback)
+        self.scan_sub = rospy.Subscriber('/scan', LaserScan, self.scan_callback)
+        self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+        
+        # Initialize SLAM
+        self.slam_gmapping = SlamGMapping()
+        self.slam_gmapping.gridmap = np.zeros((800, 800))
+        self.slam_gmapping.map_resolution = 0.05
+        self.slam_gmapping.map_size_x = 40.0
+        self.slam_gmapping.map_size_y = 40.0
+        self.slam_gmapping.laser_range = 4.0
+        self.slam_gmapping.sigma = 0.05
+        self.slam_gmapping.ogrid = False
+        self.slam_gmapping.init_mapper()
+        
+    def odom_callback(self, data):
+        # Get position and orientation from Odometry message
+        self.position_x = data.pose.pose.position.x
+        self.position_y = data.pose.pose.position.y
+        orientation_q = data.pose.pose.orientation
+        orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
+        (roll, pitch, yaw) = euler_from_quaternion(orientation_list)
+        self.orientation = yaw
+        
+    def scan_callback(self, data):
+        # Save LaserScan data
+        self.scan_data = data.ranges
+        
+    def run(self):
+        rate = rospy.Rate(10) # 10 Hz
+        while not rospy.is_shutdown():
+            # Move forward if there are no obstacles in front
+            if self.scan_data is not None and min(self.scan_data[0:30]) > 0.5:
+                cmd_vel = Twist()
+                cmd_vel.linear.x = 0.2
+                self.cmd_vel_pub.publish(cmd_vel)
+            
+            # SLAM update
+            if self.scan_data is not None:
+                self.slam_gmapping.update(self.scan_data, self.position_x, self.position_y, self.orientation)
+                self.slam_gmapping.publish_map()
+                
+            rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        node = FreenoveHexapodSLAM()
+        node.run()
+    except rospy.ROSInterruptException:
+        pass
+
+
+  while (true) {
+    loop(
+      import time
+import smbus
+from PCA9685 import PCA9685
+
+# Initialize the PCA9685 driver
+pwm = PCA9685()
+pwm.setPWMFreq(50)
+
+# Initialize the I2C bus
+bus = smbus.SMBus(1)
+
+# Check the connection to the PCA9685
+try:
+    pwm.getPCA9685AllData()
+    print("PCA9685 is connected and working.")
+except:
+    print("Error: PCA9685 is not connected.")
+
+# Check the connection to the servo motors
+for channel in range(16):
+    try:
+        pwm.setPWM(channel, 0, 150)
+        time.sleep(0.5)
+        pwm.setPWM(channel, 0, 600)
+        time.sleep(0.5)
+        pwm.setPWM(channel, 0, 375)
+        print("Servo motor on channel", channel, "is connected and working.")
+    except:
+        print("Error: Servo motor on channel", channel, "is not connected.")
+
+# Check the connection to the I2C devices
+devices = []
+for addr in range(0x03, 0x78):
+    try:
+        bus.read_byte(addr)
+        devices.append(hex(addr))
+    except:
+        pass
+
+if not devices:
+    print("Error: No I2C devices found.")
+else:
+    print("I2C devices found at:", devices)
+    );
+    printMessage();
+  }
+
+  return 0;
+}
